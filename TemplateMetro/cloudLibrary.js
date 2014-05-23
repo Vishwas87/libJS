@@ -528,7 +528,7 @@ Ext.define('cloudLibrary.proxy.PouchProxy', {
                 else
                 {
                     var msg = "No record id has been found! Record will be not update Please retry!";
-                    var err = "[PouchUpdate] The record hasn't the id property! Please check it!;
+                    var err = "[PouchUpdate] The record hasn't the id property! Please check it!";
                     operation.setException(me.formatException(msg,[err],-2));
                     if(typeof callback ==='function')
                     {

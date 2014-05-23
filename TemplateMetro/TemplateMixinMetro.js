@@ -3,25 +3,17 @@
     It adds some common methods
 */
 Ext.define("MetroMixin.controller.MainCnt",{
-    
-    startApplicationTpl: function(ret_func,parameters,scope)
-    {
-        // Method to call during the executing flow
-        if(typeof ret_func === "function") ret_func.call(scope,parameters);
-    },
-    closeApplicationTpl: function(ret_func,parameters,scope)
-    {
-        // Method to call during at the end of app's life cycle
-        if(typeof ret_func === "function") ret_func.call(scope,parameters);
-    },
-    getMainViewRef:function()
+
+    MainCnt_getMainViewRef:function()
     {
         //Method to get a reference to the main View (the AppWindow_tpl)
-        var appRef = CommonCloud.getAppRef(this.$className);
+        /*var appRef = CommonCloud.getAppRef(this.$className);
         appRef = (appRef.app)?appRef.app:null;
         var tpl_cnt = appRef.getTemplateCnt_tplController();
-        if(appRef && tpl_cnt && tpl_cnt.getMainView) return tpl_cnt.getMainView();
-        return null;
+        if(appRef && tpl_cnt && tpl_cnt.getMainView) return tpl_cnt.getMainView();*/
+        
+        if(!this._mainViewRef) this._mainViewRef = Ext.createByAlias("widget.appwindowTpl");
+        return this._mainViewRef;
     }
     
 });
@@ -32,6 +24,13 @@ Ext.define("MetroMixin.controller.MainCnt",{
 */
 Ext.define("MetroMixin.controller.TemplateCnt_tpl",{
     
+    TemplateCnt_tpl_getPreloader: function()
+    {
+      
+        if(!this._preloader) this._preloader = Ext.createByAlias("widget.metropreloader");
+        return this._preloader;
+        
+    },
     TemplateCnt_tpl_LoadWidget: function(applicationParams,successCallback,failureCallback,scope)
     {
         var parent = applicationParams.parent_id;
@@ -202,8 +201,12 @@ Ext.define("MetroMixin.view.AppWindow_tpl",{
                 {
                     appListStore.TemplateStr_Apps_CustomFilter(rnWidStore.TemplateStr_RunningWidget_isNotRunning,"app_id",rnWidStore);
                     Ext.each(records,function(rec){
+                        console.log("Il record inserito è");
+                        console.log(rec);
                         var idx = store.indexOf(rec);
                         var node = component.getNodes(idx,idx);
+                        console.log("Il nodo è");
+                        console.log(node);
                         if(node.length > 0)
                         {
                             node = node[0];
@@ -225,10 +228,19 @@ Ext.define("MetroMixin.view.AppWindow_tpl",{
                     controller.TemplateCnt_tpl_saveSidebarConfiguration();    
                 };
                 rnWidStore.on("add",f);
-                var cp = {};
-                Ext.apply(cp,record.data);
-                cp._id = cp._id + "_" + Ext.id();
-                rnWidStore.add(cp);
+                
+                
+                var recs = [];
+                
+                Ext.each(record,function(r){
+                    console.log(r);
+                    var cp = {};
+                    var v = r.data || r ;
+                    Ext.apply(cp,v);
+                    cp._id = cp.app_id + "_" + Ext.id();
+                    recs.push(cp);
+                });
+                rnWidStore.add(recs);
                 //me.Tpl_Sidebar_vw_updateHandlerBar();
             }
             
